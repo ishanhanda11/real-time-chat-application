@@ -7,3 +7,4 @@
 2026-07-11 -- Milestone 2a: Added Frontend chat UI including layout, MessageBubble, MessageInput, ChatWindow, and applied Tailwind styling.
 2026-07-11 -- Milestone 2b: Added Frontend Socket.io client, `useSocket` hook, and wired live send/receive with optimistic UI to ChatWindow and MessageInput.
 2026-07-11 -- Milestone 2c: Added chat history on load by fetching messages on mount and populating the ChatWindow with formatted timestamps.
+2026-07-11 -- Milestone 3a: Added dummy username login, protected the ChatPage via UserContext, and wired the real username into the UI.

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useUser } from '../context/UserContext';
 
 // Mock data for UI layout pass
 const MOCK_USERS = [
@@ -8,6 +9,8 @@ const MOCK_USERS = [
 ];
 
 export function Sidebar() {
+  const { user } = useUser();
+
   return (
     <div className="w-64 bg-ink h-screen flex flex-col text-surface p-4 border-r border-ink-muted/20">
       <div className="mb-8">
@@ -31,11 +34,11 @@ export function Sidebar() {
 
       <div className="mt-auto pt-4 border-t border-ink-muted/20">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-sm bg-signal flex items-center justify-center font-display font-bold">
-            Y
+          <div className="w-8 h-8 rounded-sm bg-signal flex items-center justify-center font-display font-bold uppercase">
+            {user?.username.charAt(0) || '?'}
           </div>
           <div>
-            <p className="font-display text-sm font-medium">You</p>
+            <p className="font-display text-sm font-medium truncate max-w-[120px]">{user?.username || 'Unknown'}</p>
             <p className="font-mono text-[10px] text-ink-muted">Online</p>
           </div>
         </div>

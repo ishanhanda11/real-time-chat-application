@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useSocket } from '../hooks/useSocket';
+import { useUser } from '../context/UserContext';
 
 interface MessageInputProps {
   onOptimisticSend: (msg: any) => void;
@@ -8,14 +9,15 @@ interface MessageInputProps {
 export function MessageInput({ onOptimisticSend }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const { socket, isConnected } = useSocket();
+  const { user } = useUser();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim() || !socket || !isConnected) return;
+    if (!message.trim() || !socket || !isConnected || !user) return;
 
     const newMsg = {
       content: message,
-      sender: 'You', // Placeholder until auth is implemented
+      sender: user.username,
       timestamp: new Date().toISOString()
     };
 

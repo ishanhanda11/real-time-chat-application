@@ -3,6 +3,7 @@ import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { useSocket } from '../hooks/useSocket';
 import { fetchMessages } from '../services/api';
+import { useUser } from '../context/UserContext';
 
 interface Message {
   _id?: string;
@@ -16,6 +17,7 @@ interface Message {
 export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([]);
   const { socket } = useSocket();
+  const { user } = useUser();
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export function ChatWindow() {
       .then(data => {
         // Handle if backend returns { data: [...] } or just an array
         const msgs = Array.isArray(data) ? data : data.data || [];
-        setMessages(msgs.reverse().map((m: any) => ({ ...m, isOwnMessage: m.sender === 'You' })));
+        setMessages(msgs.reverse().map((m: any) => ({ ...m, isOwnMessage: m.sender === user?.username })));
       })
       .catch(console.error);
   }, []);
@@ -43,7 +45,7 @@ export function ChatWindow() {
           // Replace optimistic message with confirmed one from server
           return prev.map(m => m === exists ? { ...message, isOwnMessage: true } : m);
         }
-        return [...prev, { ...message, isOwnMessage: message.sender === 'You' }];
+        return [...prev, { ...message, isOwnMessage: message.sender === user?.username }];
       });
     };
 
@@ -75,7 +77,7 @@ export function ChatWindow() {
             key={msg._id || msg.id || index}
             content={msg.content}
             timestamp={formatTime(msg.timestamp)}
-            isOwnMessage={msg.isOwnMessage || msg.sender === 'You'}
+            isOwnMessage={msg.isOwnMessage || msg.sender === user?.username}
             sender={msg.sender}
           />
         ))}

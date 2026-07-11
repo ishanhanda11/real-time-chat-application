@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
 import { useSocket } from '../hooks/useSocket';
+import { fetchMessages } from '../services/api';
 
 interface Message {
   _id?: string;
@@ -16,6 +17,16 @@ export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([]);
   const { socket } = useSocket();
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    fetchMessages()
+      .then(data => {
+        // Handle if backend returns { data: [...] } or just an array
+        const msgs = Array.isArray(data) ? data : data.data || [];
+        setMessages(msgs.reverse().map((m: any) => ({ ...m, isOwnMessage: m.sender === 'You' })));
+      })
+      .catch(console.error);
+  }, []);
 
   useEffect(() => {
     if (!socket) return;

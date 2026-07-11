@@ -14,6 +14,7 @@
 - Milestone 3c: Online/offline presence list.
 - Milestone 3d: Delivered/read message status.
 - Milestone 4a: Error handling pass.
+- Milestone 4b: README.
 
 ## In Progress
 
@@ -21,6 +22,5 @@
 
 ## Not Started
 
-- Milestone 4b: README.
 - Milestone 4c: Deployment.
 - Milestone 4d: Final QA pass.

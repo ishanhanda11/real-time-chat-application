@@ -1,36 +1,76 @@
-import React from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { MessageBubble } from './MessageBubble';
 import { MessageInput } from './MessageInput';
+import { useSocket } from '../hooks/useSocket';
 
-// Mock data for UI layout pass
-const MOCK_MESSAGES = [
-  { id: '1', sender: 'Alice', content: 'Hello there!', timestamp: '14:30:00', isOwnMessage: false },
-  { id: '2', sender: 'You', content: 'Hi Alice, how are you?', timestamp: '14:30:45', isOwnMessage: true },
-  { id: '3', sender: 'Alice', content: 'I am doing great! Working on the frontend layout right now.', timestamp: '14:31:10', isOwnMessage: false },
-  { id: '4', sender: 'You', content: 'Awesome, the log-style timestamps are looking good.', timestamp: '14:32:07', isOwnMessage: true },
-];
+interface Message {
+  _id?: string;
+  id?: string;
+  sender: string;
+  content: string;
+  timestamp: string;
+  isOwnMessage?: boolean;
+}
 
 export function ChatWindow() {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const { socket } = useSocket();
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleReceive = (message: Message) => {
+      setMessages((prev) => {
+        // Basic deduplication for optimistic UI
+        const exists = prev.find(m => 
+          m.content === message.content && 
+          m.sender === message.sender &&
+          new Date(m.timestamp).getTime() - new Date(message.timestamp).getTime() < 5000
+        );
+        if (exists && exists.isOwnMessage) {
+          // Replace optimistic message with confirmed one from server
+          return prev.map(m => m === exists ? { ...message, isOwnMessage: true } : m);
+        }
+        return [...prev, { ...message, isOwnMessage: message.sender === 'You' }];
+      });
+    };
+
+    socket.on('message:receive', handleReceive);
+
+    return () => {
+      socket.off('message:receive', handleReceive);
+    };
+  }, [socket]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  const handleOptimisticSend = (msg: Message) => {
+    setMessages((prev) => [...prev, { ...msg, id: Date.now().toString(), isOwnMessage: true }]);
+  };
+
+  const formatTime = (ts: string) => {
+    const d = new Date(ts);
+    return isNaN(d.getTime()) ? ts : d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  };
+
   return (
     <div className="flex-1 flex flex-col h-screen bg-canvas">
       <div className="flex-1 overflow-y-auto p-4 flex flex-col">
-        {MOCK_MESSAGES.map((msg) => (
+        {messages.map((msg, index) => (
           <MessageBubble
-            key={msg.id}
+            key={msg._id || msg.id || index}
             content={msg.content}
-            timestamp={msg.timestamp}
-            isOwnMessage={msg.isOwnMessage}
+            timestamp={formatTime(msg.timestamp)}
+            isOwnMessage={msg.isOwnMessage || msg.sender === 'You'}
             sender={msg.sender}
           />
         ))}
-        {/* Typing indicator placeholder */}
-        <div className="flex items-center gap-1 mt-2 mb-4 px-4 py-2 w-max bg-surface border border-ink-muted/10 rounded-lg rounded-bl-sm">
-          <div className="w-1.5 h-1.5 rounded-full bg-pulse animate-bounce" style={{ animationDelay: '0ms' }} />
-          <div className="w-1.5 h-1.5 rounded-full bg-pulse animate-bounce" style={{ animationDelay: '150ms' }} />
-          <div className="w-1.5 h-1.5 rounded-full bg-pulse animate-bounce" style={{ animationDelay: '300ms' }} />
-        </div>
+        <div ref={bottomRef} />
       </div>
-      <MessageInput />
+      <MessageInput onOptimisticSend={handleOptimisticSend} />
     </div>
   );
 }

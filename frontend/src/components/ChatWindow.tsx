@@ -11,6 +11,7 @@ interface Message {
   sender: string;
   content: string;
   timestamp: string;
+  status?: string;
   isOwnMessage?: boolean;
 }
 
@@ -48,6 +49,10 @@ export function ChatWindow() {
         }
         return [...prev, { ...message, isOwnMessage: message.sender === user?.username }];
       });
+
+      if (message.sender !== user?.username && message._id) {
+        socket.emit('message:status', { messageId: message._id, status: 'read' });
+      }
     };
 
     const handleTyping = ({ username }: { username: string }) => {
@@ -58,14 +63,20 @@ export function ChatWindow() {
       setTypingUsers(prev => prev.filter(u => u !== username));
     };
 
+    const handleStatus = ({ messageId, status }: { messageId: string, status: string }) => {
+      setMessages(prev => prev.map(m => (m._id === messageId ? { ...m, status } : m)));
+    };
+
     socket.on('message:receive', handleReceive);
     socket.on('user:typing', handleTyping);
     socket.on('user:stop_typing', handleStopTyping);
+    socket.on('message:status', handleStatus);
 
     return () => {
       socket.off('message:receive', handleReceive);
       socket.off('user:typing', handleTyping);
       socket.off('user:stop_typing', handleStopTyping);
+      socket.off('message:status', handleStatus);
     };
   }, [socket, user?.username]);
 
@@ -90,6 +101,7 @@ export function ChatWindow() {
             key={msg._id || msg.id || index}
             content={msg.content}
             timestamp={formatTime(msg.timestamp)}
+            status={msg.status}
             isOwnMessage={msg.isOwnMessage || msg.sender === user?.username}
             sender={msg.sender}
           />

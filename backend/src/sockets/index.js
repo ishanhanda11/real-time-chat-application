@@ -49,6 +49,18 @@ function registerSocketHandlers(io) {
       }
     });
 
+    socket.on("message:status", async ({ messageId, status }) => {
+      try {
+        if (!messageId || !status) return;
+        const msg = await Message.findByIdAndUpdate(messageId, { status }, { new: true });
+        if (msg) {
+          io.emit("message:status", { messageId: msg._id.toString(), status: msg.status });
+        }
+      } catch (error) {
+        console.error("Failed to update message status:", error);
+      }
+    });
+
     socket.on("user:typing", (payload) => {
       if (payload && payload.username) {
         socket.broadcast.emit("user:typing", { username: payload.username });

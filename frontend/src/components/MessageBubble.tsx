@@ -5,9 +5,10 @@ interface MessageBubbleProps {
   timestamp: string;
   isOwnMessage: boolean;
   sender?: string;
+  status?: string;
 }
 
-export function MessageBubble({ content, timestamp, isOwnMessage, sender }: MessageBubbleProps) {
+export function MessageBubble({ content, timestamp, isOwnMessage, sender, status }: MessageBubbleProps) {
   return (
     <div className={`flex flex-col mb-4 ${isOwnMessage ? 'items-end' : 'items-start'}`}>
       {!isOwnMessage && sender && (
@@ -22,7 +23,16 @@ export function MessageBubble({ content, timestamp, isOwnMessage, sender }: Mess
       >
         <p className="text-sm">{content}</p>
       </div>
-      <span className="font-mono text-[10px] text-ink-muted mt-1">{timestamp}</span>
+      <div className="flex items-center gap-1 mt-1">
+        <span className="font-mono text-[10px] text-ink-muted">{timestamp}</span>
+        {isOwnMessage && status && (
+          <span className={`text-[10px] font-mono font-bold ${status === 'read' ? 'text-pulse' : 'text-ink-muted'}`}>
+            {status === 'sent' && '✓'}
+            {status === 'delivered' && '✓✓'}
+            {status === 'read' && '✓✓'}
+          </span>
+        )}
+      </div>
     </div>
   );
 }

@@ -79,8 +79,15 @@ VITE_SOCKET_URL=http://localhost:5000
 
 6. Open `http://localhost:5173` in your browser.
 
-## 🏗️ Architecture Notes
+## 🏗️ Architecture & Design Decisions
 
 - **Separation of Concerns**: Clean boundary between REST API (for auth and historical data fetching) and Socket.io (for real-time bidirectional events).
 - **Socket Hooks**: Centralized `SocketProvider` wrapping the application, making real-time hooks (`useSocket`) accessible anywhere in the component tree.
 - **Resilient Error Handling**: Built-in visual error banners for failed API requests or disrupted socket payloads.
+- **UI/UX Aesthetics**: Bypassed generic templates to build a custom "Transmission Log" UI using Tailwind, demonstrating strong frontend design capabilities.
+
+## 🤔 Assumptions Made
+
+- **Single Global Room**: Assumed a single global chat room was sufficient to demonstrate real-time broadcasting and presence mechanics. No complex private routing was implemented to keep the scope focused on core real-time latency.
+- **Dummy Authentication**: Implemented a frictionless find-or-create login system based strictly on unique usernames. Passwords and JWTs were omitted to focus purely on the chat UX.
+- **Read Receipts**: Assumed that if a client receives a message while connected to the global channel, it counts as 'read' instantly.

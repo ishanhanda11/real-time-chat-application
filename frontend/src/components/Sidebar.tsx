@@ -3,7 +3,7 @@ import { useUser } from '../context/UserContext';
 import { useSocket } from '../hooks/useSocket';
 
 export function Sidebar() {
-  const { user } = useUser();
+  const { user, logout } = useUser();
   const { socket } = useSocket();
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
@@ -42,15 +42,22 @@ export function Sidebar() {
         </ul>
       </div>
 
-      <div className="mt-auto pt-4 border-t border-ink-muted/20">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-sm bg-signal flex items-center justify-center font-display font-bold uppercase">
-            {user?.username.charAt(0) || '?'}
+      <div className="mt-auto">
+        {/* Current User Widget */}
+        <div className="pt-4 border-t border-ink-muted/20 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded bg-signal flex items-center justify-center text-ink font-bold font-display shadow-md">
+              {user?.username.charAt(0).toUpperCase()}
+            </div>
+            <span className="font-body text-sm font-medium truncate max-w-[100px]">{user?.username}</span>
           </div>
-          <div>
-            <p className="font-display text-sm font-medium truncate max-w-[120px]">{user?.username || 'Unknown'}</p>
-            <p className="font-mono text-[10px] text-ink-muted">Online</p>
-          </div>
+          <button
+            onClick={logout}
+            className="text-[10px] font-display uppercase tracking-wider text-ink-muted hover:text-signal transition-colors p-1"
+            title="Log Out"
+          >
+            [Exit]
+          </button>
         </div>
       </div>
     </div>

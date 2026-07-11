@@ -1,6 +1,7 @@
 const http = require("http");
 const { Server } = require("socket.io");
 const app = require("./app");
+const connectDb = require("./config/db");
 const env = require("./config/env");
 
 const server = http.createServer(app);
@@ -13,6 +14,13 @@ const io = new Server(server, {
 
 app.set("io", io);
 
-server.listen(env.port, () => {
-  console.log(`Backend listening on port ${env.port}`);
-});
+connectDb()
+  .then(() => {
+    server.listen(env.port, () => {
+      console.log(`Backend listening on port ${env.port}`);
+    });
+  })
+  .catch((error) => {
+    console.error("Failed to start server:", error.message);
+    process.exit(1);
+  });

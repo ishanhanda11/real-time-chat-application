@@ -14,8 +14,8 @@ export function LoginPage() {
     setError('');
     try {
       await login(username);
-    } catch (err) {
-      setError('Failed to login. Please try again.');
+    } catch (err: any) {
+      setError(err.message || 'Failed to login. Please try again.');
     } finally {
       setLoading(false);
     }

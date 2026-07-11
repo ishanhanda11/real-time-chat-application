@@ -18,6 +18,7 @@ interface Message {
 export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const { socket } = useSocket();
   const { user } = useUser();
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -29,8 +30,8 @@ export function ChatWindow() {
         const msgs = Array.isArray(data) ? data : data.data || [];
         setMessages(msgs.reverse().map((m: any) => ({ ...m, isOwnMessage: m.sender === user?.username })));
       })
-      .catch(console.error);
-  }, []);
+      .catch((err) => setError('Failed to load chat history.'));
+  }, [user?.username]);
 
   useEffect(() => {
     if (!socket) return;
@@ -67,16 +68,23 @@ export function ChatWindow() {
       setMessages(prev => prev.map(m => (m._id === messageId ? { ...m, status } : m)));
     };
 
+    const handleError = (err: { message: string }) => {
+      setError(err.message);
+      setTimeout(() => setError(null), 5000);
+    };
+
     socket.on('message:receive', handleReceive);
     socket.on('user:typing', handleTyping);
     socket.on('user:stop_typing', handleStopTyping);
     socket.on('message:status', handleStatus);
+    socket.on('error', handleError);
 
     return () => {
       socket.off('message:receive', handleReceive);
       socket.off('user:typing', handleTyping);
       socket.off('user:stop_typing', handleStopTyping);
       socket.off('message:status', handleStatus);
+      socket.off('error', handleError);
     };
   }, [socket, user?.username]);
 
@@ -95,6 +103,11 @@ export function ChatWindow() {
 
   return (
     <div className="flex-1 flex flex-col h-screen bg-canvas">
+      {error && (
+        <div className="bg-red-500/10 border-b border-red-500/20 text-red-500 text-sm px-4 py-2 text-center font-display shadow-sm">
+          {error}
+        </div>
+      )}
       <div className="flex-1 overflow-y-auto p-4 flex flex-col">
         {messages.map((msg, index) => (
           <MessageBubble

@@ -4,3 +4,4 @@
 2026-07-11 -- Milestone 1b: Added MongoDB connection config, Message model, and backend/frontend environment examples.
 2026-07-11 -- Milestone 1c: Added paginated message REST endpoints and central Express error handling.
 2026-07-11 -- Milestone 1d: Added Socket.io connection handling, message persistence and broadcast flow, and local runtime env files.
+2026-07-11 -- Milestone 2a: Added Frontend chat UI including layout, MessageBubble, MessageInput, ChatWindow, and applied Tailwind styling.

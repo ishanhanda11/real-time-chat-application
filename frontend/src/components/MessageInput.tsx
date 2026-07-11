@@ -1,0 +1,31 @@
+import React, { useState } from 'react';
+
+export function MessageInput() {
+  const [message, setMessage] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!message.trim()) return;
+    // For now, prevent default and clear
+    setMessage('');
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="p-4 bg-canvas border-t border-ink-muted/10 flex items-center gap-2">
+      <input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Type a message..."
+        className="flex-1 bg-surface text-ink border border-ink-muted/20 rounded-md px-4 py-2 focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal transition-colors"
+      />
+      <button
+        type="submit"
+        disabled={!message.trim()}
+        className="bg-signal text-white px-6 py-2 rounded-md font-display font-medium hover:bg-signal/90 disabled:opacity-50 disabled:cursor-not-allowed transition-all focus:outline-none focus:ring-2 focus:ring-signal focus:ring-offset-2 focus:ring-offset-canvas"
+      >
+        Send
+      </button>
+    </form>
+  );
+}

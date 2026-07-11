@@ -13,3 +13,4 @@
 2026-07-11 -- Milestone 3d: Implemented read receipts using `message:status` socket event, MongoDB status persistence, and MessageBubble UI checkmarks.
 2026-07-11 -- Milestone 4a: Added comprehensive error handling for REST API and Socket.io events, including a user-facing error banner in the ChatWindow.
 2026-07-11 -- Milestone 4b: Wrote the project README with setup instructions, tech stack, environment variables, and architecture notes.
+2026-07-11 -- Milestone 4c: Prepared codebase and provided execution strategy for full-stack deployment on Vercel and Render.

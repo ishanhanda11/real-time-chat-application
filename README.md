@@ -4,6 +4,11 @@ A high-performance, real-time chat application built with the MERN stack (MongoD
 
 ![App Screenshot](./placeholder.png) <!-- Add your screenshot here and name it placeholder.png or update the path -->
 
+## 🌐 Live Demo
+
+**Frontend**: [https://real-time-chat-application-lovat.vercel.app/](https://real-time-chat-application-lovat.vercel.app/)  
+**Backend API**: [https://real-time-chat-application-zl8i.onrender.com](https://real-time-chat-application-zl8i.onrender.com)
+
 ## ✨ Features
 
 - **Real-Time Messaging**: Instant message delivery using Socket.io.
@@ -38,13 +43,13 @@ To run this project, you will need to add the following environment variables to
 ```env
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
-CLIENT_ORIGIN=http://localhost:5173
+CLIENT_ORIGIN=http://localhost:5173 # Or your Vercel URL in production
 ```
 
 ### Frontend (`frontend/.env`)
 ```env
-VITE_API_URL=http://localhost:5000/api
-VITE_SOCKET_URL=http://localhost:5000
+VITE_API_URL=http://localhost:5000/api # Or your Render URL in production (e.g., https://your-backend.onrender.com/api)
+VITE_SOCKET_URL=http://localhost:5000 # Or your Render URL in production (e.g., https://your-backend.onrender.com)
 ```
 
 ## 🚀 Installation & Setup

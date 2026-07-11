@@ -16,6 +16,7 @@ interface Message {
 
 export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([]);
+  const [typingUsers, setTypingUsers] = useState<string[]>([]);
   const { socket } = useSocket();
   const { user } = useUser();
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -49,12 +50,24 @@ export function ChatWindow() {
       });
     };
 
+    const handleTyping = ({ username }: { username: string }) => {
+      setTypingUsers(prev => prev.includes(username) ? prev : [...prev, username]);
+    };
+
+    const handleStopTyping = ({ username }: { username: string }) => {
+      setTypingUsers(prev => prev.filter(u => u !== username));
+    };
+
     socket.on('message:receive', handleReceive);
+    socket.on('user:typing', handleTyping);
+    socket.on('user:stop_typing', handleStopTyping);
 
     return () => {
       socket.off('message:receive', handleReceive);
+      socket.off('user:typing', handleTyping);
+      socket.off('user:stop_typing', handleStopTyping);
     };
-  }, [socket]);
+  }, [socket, user?.username]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -81,6 +94,18 @@ export function ChatWindow() {
             sender={msg.sender}
           />
         ))}
+        {typingUsers.length > 0 && (
+          <div className="flex flex-col items-start mb-4">
+            <span className="text-xs text-ink-muted mb-1 font-display">
+              {typingUsers.join(', ')} {typingUsers.length === 1 ? 'is' : 'are'} typing...
+            </span>
+            <div className="flex items-center gap-1 px-4 py-3 w-max bg-surface border border-ink-muted/10 rounded-lg rounded-bl-sm">
+              <div className="w-1.5 h-1.5 rounded-full bg-pulse animate-bounce" style={{ animationDelay: '0ms' }} />
+              <div className="w-1.5 h-1.5 rounded-full bg-pulse animate-bounce" style={{ animationDelay: '150ms' }} />
+              <div className="w-1.5 h-1.5 rounded-full bg-pulse animate-bounce" style={{ animationDelay: '300ms' }} />
+            </div>
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
       <MessageInput onOptimisticSend={handleOptimisticSend} />

@@ -10,6 +10,7 @@
 - Milestone 2b: Frontend Socket.io client -- useSocket hook, live send/receive wired to UI, optimistic UI on send.
 - Milestone 2c: Chat history on load -- GET request populates ChatWindow on mount/refresh, timestamps formatted and displayed.
 - Milestone 3a: Dummy username login.
+- Milestone 3b: Typing indicator.
 
 ## In Progress
 
@@ -17,7 +18,6 @@
 
 ## Not Started
 
-- Milestone 3b: Typing indicator.
 - Milestone 3c: Online/offline presence list.
 - Milestone 3d: Delivered/read message status.
 - Milestone 4a: Error handling pass.

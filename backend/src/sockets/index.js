@@ -38,6 +38,18 @@ function registerSocketHandlers(io) {
       }
     });
 
+    socket.on("user:typing", (payload) => {
+      if (payload && payload.username) {
+        socket.broadcast.emit("user:typing", { username: payload.username });
+      }
+    });
+
+    socket.on("user:stop_typing", (payload) => {
+      if (payload && payload.username) {
+        socket.broadcast.emit("user:stop_typing", { username: payload.username });
+      }
+    });
+
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.id}`);
     });

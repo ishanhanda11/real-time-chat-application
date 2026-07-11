@@ -10,6 +10,23 @@ export function MessageInput({ onOptimisticSend }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const { socket, isConnected } = useSocket();
   const { user } = useUser();
+  const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMessage(e.target.value);
+    
+    if (socket && isConnected && user) {
+      socket.emit('user:typing', { username: user.username });
+      
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
+      
+      typingTimeoutRef.current = setTimeout(() => {
+        socket.emit('user:stop_typing', { username: user.username });
+      }, 2000);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,6 +44,9 @@ export function MessageInput({ onOptimisticSend }: MessageInputProps) {
     // Emit to server
     socket.emit('message:send', newMsg);
     
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    socket.emit('user:stop_typing', { username: user.username });
+    
     setMessage('');
   };
 
@@ -35,7 +55,7 @@ export function MessageInput({ onOptimisticSend }: MessageInputProps) {
       <input
         type="text"
         value={message}
-        onChange={(e) => setMessage(e.target.value)}
+        onChange={handleChange}
         placeholder={isConnected ? "Type a message..." : "Connecting..."}
         disabled={!isConnected}
         className="flex-1 bg-surface text-ink border border-ink-muted/20 rounded-md px-4 py-2 focus:outline-none focus:border-signal focus:ring-1 focus:ring-signal transition-colors disabled:opacity-50"

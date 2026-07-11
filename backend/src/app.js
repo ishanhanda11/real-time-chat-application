@@ -1,6 +1,9 @@
 const cors = require("cors");
 const express = require("express");
 const env = require("./config/env");
+const errorHandler = require("./middleware/errorHandler");
+const notFound = require("./middleware/notFound");
+const messagesRoutes = require("./routes/messages.routes");
 
 const app = express();
 
@@ -10,5 +13,9 @@ app.use(
   })
 );
 app.use(express.json());
+
+app.use("/api/messages", messagesRoutes);
+app.use(notFound);
+app.use(errorHandler);
 
 module.exports = app;

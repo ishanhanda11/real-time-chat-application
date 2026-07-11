@@ -10,7 +10,7 @@ export function MessageInput({ onOptimisticSend }: MessageInputProps) {
   const [message, setMessage] = useState('');
   const { socket, isConnected } = useSocket();
   const { user } = useUser();
-  const typingTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);

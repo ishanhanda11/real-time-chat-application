@@ -12,13 +12,24 @@ function isValidMessagePayload(payload) {
     typeof payload.sender === "string" &&
     typeof payload.content === "string" &&
     payload.sender.trim() &&
+    payload.sender.trim() &&
     payload.content.trim()
   );
 }
 
+const onlineUsers = new Map(); // socket.id -> username
+
 function registerSocketHandlers(io) {
   io.on("connection", (socket) => {
     console.log(`Socket connected: ${socket.id}`);
+
+    socket.on("user:online", (payload) => {
+      if (payload && payload.username) {
+        onlineUsers.set(socket.id, payload.username);
+        // Send a unique list of online usernames
+        io.emit("users:list", Array.from(new Set(onlineUsers.values())));
+      }
+    });
 
     socket.on("message:send", async (payload) => {
       try {
@@ -52,6 +63,11 @@ function registerSocketHandlers(io) {
 
     socket.on("disconnect", () => {
       console.log(`Socket disconnected: ${socket.id}`);
+      const username = onlineUsers.get(socket.id);
+      if (username) {
+        onlineUsers.delete(socket.id);
+        io.emit("users:list", Array.from(new Set(onlineUsers.values())));
+      }
     });
   });
 }

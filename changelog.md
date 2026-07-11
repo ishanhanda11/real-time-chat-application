@@ -9,3 +9,4 @@
 2026-07-11 -- Milestone 2c: Added chat history on load by fetching messages on mount and populating the ChatWindow with formatted timestamps.
 2026-07-11 -- Milestone 3a: Added dummy username login, protected the ChatPage via UserContext, and wired the real username into the UI.
 2026-07-11 -- Milestone 3b: Added typing indicator using `user:typing` and `user:stop_typing` socket events with animated UI.
+2026-07-11 -- Milestone 3c: Added real-time online/offline presence list in the sidebar using `user:online` and `disconnect` socket events.

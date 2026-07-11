@@ -1,15 +1,27 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useUser } from '../context/UserContext';
-
-// Mock data for UI layout pass
-const MOCK_USERS = [
-  { id: '1', username: 'Alice', isOnline: true },
-  { id: '2', username: 'Bob', isOnline: false },
-  { id: '3', username: 'Charlie', isOnline: true },
-];
+import { useSocket } from '../hooks/useSocket';
 
 export function Sidebar() {
   const { user } = useUser();
+  const { socket } = useSocket();
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    socket.emit('user:online', { username: user.username });
+
+    const handleUsersList = (users: string[]) => {
+      setOnlineUsers(users.filter(u => u !== user.username));
+    };
+
+    socket.on('users:list', handleUsersList);
+
+    return () => {
+      socket.off('users:list', handleUsersList);
+    };
+  }, [socket, user]);
 
   return (
     <div className="w-64 bg-ink h-screen flex flex-col text-surface p-4 border-r border-ink-muted/20">
@@ -21,12 +33,10 @@ export function Sidebar() {
       <div className="flex-1">
         <h2 className="font-display text-sm font-semibold text-ink-muted mb-4 uppercase tracking-wider">Signals</h2>
         <ul className="space-y-3">
-          {MOCK_USERS.map((user) => (
-            <li key={user.id} className="flex items-center justify-between">
-              <span className="font-body text-sm">{user.username}</span>
-              {user.isOnline && (
-                <span className="w-2 h-2 rounded-full bg-pulse shadow-[0_0_8px_rgba(224,164,88,0.6)]"></span>
-              )}
+          {onlineUsers.map((username) => (
+            <li key={username} className="flex items-center justify-between">
+              <span className="font-body text-sm truncate pr-2">{username}</span>
+              <span className="flex-shrink-0 w-2 h-2 rounded-full bg-pulse shadow-[0_0_8px_rgba(224,164,88,0.6)]"></span>
             </li>
           ))}
         </ul>
